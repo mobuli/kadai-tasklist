@@ -3,120 +3,58 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Task;
+//use App\Task;
 
 class TasksController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+
+
     public function index()
     {
-        return view('tasks.index', [
-            'tasks' => Task::all(),
-        ]);
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+        }
+
+        return view('welcome', $data);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $taks = new Task;
 
-        return view('tasks.create', [
-            'task' => $taks,
-        ]);
 
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
             'content' => 'required|max:191',
-            'status'  => 'required|max:10',
         ]);
-        
-        $taks = new Task;
-        $taks->content = $request->content;
-        $taks->status = $request->status;
-        $taks->save();
 
-        return redirect('/');
+        $request->user()->tasks()->create([
+            'content' => $request->content,
+        ]);
+
+        return back();
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        return view('tasks.show', [
-            'task' => Task::find($id),
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $taks = Task::find($id);
-
-        return view('tasks.edit', [
-            'task' => $taks,
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        
-        $this->validate($request, [
-            'content' => 'required|max:191',
-            'status'  => 'required|max:10',
-        ]);
-        
-        $taks = Task::find($id);
-        $taks->content = $request->content;
-        $taks->status = $request->status;
-        $taks->save();
-
-        return redirect('/');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        $taks = Task::find($id);
-        $taks->delete();
+        $task = \App\Task::find($id);
 
-        return redirect('/');
+        if (\Auth::id() === $task->user_id) {
+            $task->delete();
+        }
+
+        return back();
     }
+
+
+
 }
+
+
