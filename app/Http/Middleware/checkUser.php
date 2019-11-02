@@ -23,7 +23,7 @@ class CheckUser
             $route_id = $request->route()->parameter('task');
             if($route_id){
                 if(Task::find($route_id)->user_id !== Auth::id()){
-                    Auth::logout();
+                    return redirect()->route('logout.get');
                 }
             }
         }
