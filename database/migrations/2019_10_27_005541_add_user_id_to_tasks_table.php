@@ -14,8 +14,8 @@ class AddUserIdToTasksTable extends Migration
     public function up()
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->string('status')->nullable()->change();
-            $table->dropColumn('status');
+            //$table->string('status')->nullable()->change();
+            //$table->dropColumn('status');
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users');
         });
