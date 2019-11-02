@@ -2,13 +2,9 @@
 
 @section('content')
 
-    <h1>No.{{ $task->id }} のタスク詳細</h1>
+    <h1>詳細画面</h1>
 
     <table class="table table-bordered">
-        <tr>
-            <th>No</th>
-            <td>{{ $task->id }}</td>
-        </tr>
         <tr>
             <th>タスク</th>
             <td>{{ $task->content }}</td>
